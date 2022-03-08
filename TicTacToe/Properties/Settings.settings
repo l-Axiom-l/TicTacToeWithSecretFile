@@ -3,8 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="Setting" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Das istr ein Test
-Ich bin Moritz</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="Key" Type="System.String" Scope="User">
       <Value Profile="(Default)">cO5hA9Cl+1ED8njG0EzpGv6ZjDOLidPsQFwR/GdxTtM=</Value>
