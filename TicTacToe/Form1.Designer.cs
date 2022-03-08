@@ -197,6 +197,7 @@ namespace TicTacToe
             // 
             // button1
             // 
+            this.button1.Enabled = false;
             this.button1.Location = new System.Drawing.Point(23, 384);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
@@ -207,6 +208,7 @@ namespace TicTacToe
             // 
             // button2
             // 
+            this.button2.Enabled = false;
             this.button2.Location = new System.Drawing.Point(104, 383);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(75, 23);
