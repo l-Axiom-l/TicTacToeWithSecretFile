@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Windows.Forms;
 using EasyEncrypt2;
+using System.Diagnostics;
 
 namespace TicTacToe
 {
@@ -22,6 +23,8 @@ namespace TicTacToe
         EasyEncrypt crypto;
         SymmetricAlgorithm algo = SymmetricAlgorithm.Create();
         bool unlock = false;
+
+        int[,] board = new int[3, 3];
 
         public Form1()
         {
@@ -41,6 +44,7 @@ namespace TicTacToe
                 return;
 
             buttons.ElementAt(0).BackgroundImage = image;
+            Debug.WriteLine(Convert.ToInt32(buttons.ElementAt(0).Name.First()) - 64);
             list.Add(buttons.ElementAt(0).Name);
         }
 
@@ -69,7 +73,8 @@ namespace TicTacToe
         {
             foreach (string item in Rules)
             {
-                string[] split = item.Split(' ');
+                Console.WriteLine(item.Replace("\n", ""));
+                string[] split = item.Replace("\n", "").Split(' ');
                 if (list.Contains(split[0]) && list.Contains(split[1]) && list.Contains(split[2]))
                     Win();
             }
@@ -173,6 +178,16 @@ namespace TicTacToe
             Properties.Settings.Default.Setting = crypto.Encrypt(Properties.Settings.Default.Setting);
             console.AppendText(Properties.Settings.Default.Setting);
             Properties.Settings.Default.Save();
+        }
+
+        void Test(int X, int Y)
+        {
+            board[X, Y] = 1;
+        }
+
+        void SumBoard()
+        {
+
         }
     }
 }
