@@ -1,7 +1,7 @@
 ﻿
 namespace TicTacToe
 {
-    partial class TicTacToe
+    partial class Form1
     {
         /// <summary>
         /// Required designer variable.
@@ -29,6 +29,7 @@ namespace TicTacToe
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.A1 = new System.Windows.Forms.Button();
             this.A2 = new System.Windows.Forms.Button();
             this.A3 = new System.Windows.Forms.Button();
@@ -193,7 +194,7 @@ namespace TicTacToe
             this.restart.UseVisualStyleBackColor = true;
             this.restart.Click += new System.EventHandler(this.restart_Click);
             // 
-            // TicTacToe
+            // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -202,8 +203,9 @@ namespace TicTacToe
             this.Controls.Add(this.display);
             this.Controls.Add(this.console);
             this.Controls.Add(this.Board);
-            this.Name = "TicTacToe";
-            this.Text = "Form1";
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Name = "Form1";
+            this.Text = "TicTacToe";
             this.Board.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();

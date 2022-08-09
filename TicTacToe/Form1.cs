@@ -10,7 +10,7 @@ using System.Diagnostics;
 
 namespace TicTacToe
 {
-    public partial class TicTacToe : Form
+    public partial class Form1 : Form
     {
         bool Player1 = true;
         int counter = 0;
@@ -23,7 +23,7 @@ namespace TicTacToe
                                     {-1, 1,-1 },
                                     { 1,-1, 1 }};
 
-        public TicTacToe()
+        public Form1()
         {
             InitializeComponent();
             Application.ApplicationExit += (s, e) => Lock();
