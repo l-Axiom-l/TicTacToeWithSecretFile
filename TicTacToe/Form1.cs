@@ -10,42 +10,38 @@ using System.Diagnostics;
 
 namespace TicTacToe
 {
-    public partial class Form1 : Form
+    public partial class TicTacToe : Form
     {
         bool Player1 = true;
         int counter = 0;
         int resetCounter = 0;
-        List<string> Rules = new List<string>();
-        List<string> Player1List = new List<string>();
-        List<string> Player2List = new List<string>();
-        string P1 = "A1 A3 C1 C3 B2";
-        string P2 = "A2 B1 B3 C2";
         EasyEncrypt crypto;
         SymmetricAlgorithm algo = SymmetricAlgorithm.Create();
         bool unlock = false;
-
         int[,] board = new int[3, 3];
+        int[,] code = new int[3, 3] {{ 1,-1, 1},
+                                    {-1, 1,-1 },
+                                    { 1,-1, 1 }};
 
-        public Form1()
+        public TicTacToe()
         {
             InitializeComponent();
             Application.ApplicationExit += (s, e) => Lock();
-            console.KeyDown += (s, e) => { if (e.KeyCode == Keys.F1) Confirm(); };
             crypto = new EasyEncrypt("5642", "Y9iGr@dya?)7", algo);
             Properties.Settings.Default.Reload();
-            Rules = Properties.Resources.TicTacToeRules.Split('\n').ToList();
         }
 
-        void ChangeField(int Index, Image image, ref List<string> list)
+        void ChangeField(int Index, Image image)
         {
             IEnumerable<Button> buttons = Board.Controls.OfType<Button>().Where(x => x.GetHashCode().Equals(Index));
-
-            if (Player1List.Contains(buttons.ElementAt(0).Name) || Player2List.Contains(buttons.ElementAt(0).Name))
+            int Y = Convert.ToInt32(buttons.ElementAt(0).Name.First()) - 65;
+            int X = Convert.ToInt32(buttons.ElementAt(0).Name.Last()) - 49;
+            if (board[X, Y] != 0)
                 return;
-
             buttons.ElementAt(0).BackgroundImage = image;
-            Debug.WriteLine(Convert.ToInt32(buttons.ElementAt(0).Name.First()) - 64);
-            list.Add(buttons.ElementAt(0).Name);
+            board[X, Y] = Player1 ? 1 : -1;
+            Debug.WriteLine($"{X}:{Y}");
+            Test();
         }
 
         private void Click(object sender, EventArgs e)
@@ -55,29 +51,14 @@ namespace TicTacToe
             display.Text = "Round : " + counter;
             if (Player1)
             {
-                ChangeField(sender.GetHashCode(), Properties.Resources.Cross, ref Player1List);
-                console.AppendText("Player1 : " + Player1List.Last() + Environment.NewLine);
-                Check(Player1List);
+                ChangeField(sender.GetHashCode(), Properties.Resources.Cross);
             }
             else
             {
-                ChangeField(sender.GetHashCode(), Properties.Resources.Circle, ref Player2List);
-                console.AppendText("Player2 : " + Player2List.Last() + Environment.NewLine);
-                Check(Player2List);
+                ChangeField(sender.GetHashCode(), Properties.Resources.Circle);
             }
-
 
             Player1 = !Player1;
-        }
-        void Check(List<string> list)
-        {
-            foreach (string item in Rules)
-            {
-                Console.WriteLine(item.Replace("\n", ""));
-                string[] split = item.Replace("\n", "").Split(' ');
-                if (list.Contains(split[0]) && list.Contains(split[1]) && list.Contains(split[2]))
-                    Win();
-            }
         }
         void Win()
         {
@@ -91,14 +72,12 @@ namespace TicTacToe
         private void restart_Click(object sender, EventArgs e)
         {
             resetCounter++;
+            board = new int[3, 3];
             Board.Enabled = true;
             display.ForeColor = Color.Black;
             counter = 0;
             display.Text = "Round : " + counter;
-
             foreach (Button button in Board.Controls.OfType<Button>()) button.BackgroundImage = null;
-            Player1List.Clear();
-            Player2List.Clear();
             Player1 = true;
             console.ResetText();
             console.ReadOnly = true;
@@ -110,12 +89,12 @@ namespace TicTacToe
 
         private void display_Click(object sender, EventArgs e)
         {
-            string[] split = P1.Split(' ');
-            string[] split2 = P2.Split(' ');
-            if (Player1List.All(x => split.Contains(x)) && Player2List.All(x => split2.Contains(x)) && Player1List.Count > 0 && Player2List.Count > 0)
+            Debug.WriteLine("DisplayClick");
+            if (board.ArrayTester(code))
             {
                 console.ResetText();
                 console.ReadOnly = false;
+                Debug.WriteLine("Unlock");
                 Unlock();
             }
         }
@@ -133,19 +112,20 @@ namespace TicTacToe
             temp = crypto.Decrypt(temp);
             Properties.Settings.Default.Setting = temp;
             console.Text = Properties.Settings.Default.Setting;
-
-
         }
 
         void Lock()
         {
             if (!unlock)
                 return;
-
+            DialogResult result = MessageBox.Show("Do you want to save your changes?", "Attention", MessageBoxButtons.YesNo);
+            if (result == DialogResult.Yes)
+                Confirm();
             string temp = crypto.Encrypt(Properties.Settings.Default.Setting);
             Properties.Settings.Default.Setting = temp;
-            MessageBox.Show(temp, "Attention", MessageBoxButtons.OK);
+            MessageBox.Show(temp, "Locked", MessageBoxButtons.OK);
             Properties.Settings.Default.Save();
+            unlock = false;
         }
 
 
@@ -155,7 +135,6 @@ namespace TicTacToe
                 return;
 
             Properties.Settings.Default.Setting = console.Text;
-            MessageBox.Show("Saved");
         }
 
         void Reset()
@@ -165,28 +144,58 @@ namespace TicTacToe
             Properties.Settings.Default.Save();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        void Test()
         {
-            Properties.Settings.Default.Reload();
-            Properties.Settings.Default.Setting = crypto.Decrypt(Properties.Settings.Default.Setting);
-            console.Text = Properties.Settings.Default.Setting;
-            Properties.Settings.Default.Save();
+            int[] Rows = Enumerable.Range(0, 3).Select(x => GetRow(board, x).Sum()).ToArray();
+            int[] Columns = Enumerable.Range(0, 3).Select(x => GetColumn(board, x).Sum()).ToArray();
+            if (Rows.Contains(3) || Rows.Contains(-3) || Columns.Contains(3) || Columns.Contains(-3) || DiagonalsSums(board).Contains(3) || DiagonalsSums(board).Contains(-3))
+            {
+                Win();
+                Debug.WriteLine("Win");
+            }
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        public int[] GetRow(int[,] board, int rowNumber)
         {
-            Properties.Settings.Default.Setting = crypto.Encrypt(Properties.Settings.Default.Setting);
-            console.AppendText(Properties.Settings.Default.Setting);
-            Properties.Settings.Default.Save();
+            return Enumerable.Range(0, board.GetLength(0)).Select(x => board[x, rowNumber]).ToArray();
         }
 
-        void Test(int X, int Y)
+        public int[] GetColumn(int[,] board, int columnNumber)
         {
-            board[X, Y] = 1;
+            return Enumerable.Range(0, board.GetLength(0)).Select(x => board[columnNumber, x]).ToArray();
         }
 
-        void SumBoard()
+        public int[] DiagonalsSums(int[,] board)
         {
+            int[] ULC = Enumerable.Range(0, board.GetLength(0)).Select(x => board[x, x]).ToArray();
+            int[] numbers = Enumerable.Range(0, 3).ToArray();
+            int[] URC = numbers.Select(x => board[x, numbers.Reverse().ElementAt(x)]).ToArray();
+            return new int[] { ULC.Sum(), URC.Sum() };
+        }
+    }
+
+    public static class Utilities
+    {
+        public static bool ArrayTester(this int[,] mainArray, int[,] testArray)
+        {
+            bool test = false;
+            for (int i = 0; i < mainArray.GetLength(0); i++)
+                for (int j = 0; j < mainArray.GetLength(1); j++)
+                {
+                    if (mainArray[i, j] == testArray[i, j])
+                    {
+                        test = true;
+                        continue;
+                    }
+
+                    else
+                    {
+                        test = false;
+                        break;
+                        break;
+                    }
+                }
+            return test;
 
         }
     }
