@@ -79,9 +79,9 @@ namespace TicTacToe
             display.Text = "Round : " + counter;
             foreach (Button button in Board.Controls.OfType<Button>()) button.BackgroundImage = null;
             Player1 = true;
+            Lock();
             console.ResetText();
             console.ReadOnly = true;
-            Lock();
 
             if (resetCounter > 10)
                 Reset();
@@ -121,6 +121,7 @@ namespace TicTacToe
             DialogResult result = MessageBox.Show("Do you want to save your changes?", "Attention", MessageBoxButtons.YesNo);
             if (result == DialogResult.Yes)
                 Confirm();
+
             string temp = crypto.Encrypt(Properties.Settings.Default.Setting);
             Properties.Settings.Default.Setting = temp;
             MessageBox.Show(temp, "Locked", MessageBoxButtons.OK);
